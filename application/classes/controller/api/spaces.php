@@ -1,18 +1,18 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class Controller_Api_Spaces extends Controller {
+class Controller_Api_Spaces extends Controller_Api {
 
     public function action_index($id=null) {
         $this->request->response = json_encode(
-           ORM::factory('space')->find_all()
-//           $this->orm_as_array('space',$id)
+            $this->orm_as_array('space', $id)
         );
     }
 
     public function action_with($marker_identifier=null) {
-        $this->request->response = json_encode($this->orm_as_array('space',$marker_identifier));
+        return $this->json_response(
+             ORM::factory(
+                'marker', array('email' => $marker_identifier))
+                ->get_space_by_email()
+        );
     }
-
-    
-
 }

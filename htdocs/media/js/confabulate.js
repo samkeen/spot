@@ -73,7 +73,7 @@ var confab = {
     var that = this;
     this.over_marker_id = null;
     $.getJSON(
-      that.remove_marker_url+"/"+marker_id+".json?callback=?",
+      that.remove_marker_url+"/"+marker_id+"?callback=?",
       function(result){
         if(result['success']) {
           $('#marker_feedback p').html("Removal Successful").fadeIn(1000).delay(1000).fadeOut(2000);
@@ -89,7 +89,7 @@ var confab = {
     var that = this;
     var marker_id = marker.id!==null ? "/"+marker.id : "/";
     $.getJSON(
-      that.save_markers_url+marker_id+".json?callback=?",
+      that.save_markers_url+marker_id+"?callback=?",
       that.square_brackify_keys('person', marker),
       function(result){
         if(result['success']) {
@@ -268,7 +268,7 @@ var confab = {
   populate_markers : function() {
     var that = this;
     if(this.current_focus_id!==null) {
-      $.getJSON(that.get_markers_url+"/"+this.current_focus_id+".json?callback=?",
+      $.getJSON(that.get_markers_url+"/"+this.current_focus_id+"?callback=?",
         function(space_w_markers){
           var markers = space_w_markers['placements'];
           that.present_location.site = space_w_markers['site'];

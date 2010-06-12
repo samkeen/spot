@@ -12,14 +12,39 @@ class Model_Marker extends ORM {
         'email' => array('not_empty' => array()),
     );
 
-    public function get_space_by_email($email) {
-        $focus_marker = null;
-        $markers =
-                $this->db->select('markers.*')
-                ->from('markers')
-                ->where(array('active' => 1))
-                ->get();
-        $markers = $this->result_as_array($markers);
+    public function get_space_by_email() {
+        $out = array();
+        if($this->email) {
+            // get all the spaces this marker is in
+            $spaces = $this->spaces->find_all();
+                // for each space, get all its info
+                foreach ($spaces as $space) {
+                    // fully populate the object (lazy loading)
+                    $space->building->site;
+                    $space = $space->as_array();
+//                    print_r($space);
+                    $reorg['site'] = $space['building']['site'];
+                    unset ($space['building']['site']);
+                    $reorg['building'] = $space['building'];
+                    $reorg['space'] = array(
+                        'id' => $space['space_id'],
+                        'image_uri' => $space['img_uri'],
+                        'index' => $space['index'],
+                        'name' => $space['name']
+                    );
+                    $reorg['marker'] = array(
+                        'id' => $space['id'],
+                        'email' => $this->email,
+                        'x' => $space['x'],
+                        'y' => $space['y'],
+                    );
+                    $out[] = $reorg;
+                }
+        }
+        return $out;
+      
+        
+//        $markers = $this->result_as_array($markers);
         foreach ($markers as $marker) {
             if($marker['email']==$email) {
                 $focus_marker=$marker;
@@ -27,7 +52,7 @@ class Model_Marker extends ORM {
             }
         }
         $location_info =
-                $this->db->select(
+                DB::select(
                 'spaces.name AS space_name, spaces.index AS space_index,
        spaces.img_uri AS space_img_uri, spaces.active AS space_active,
        buildings.name AS building_name, buildings.lat AS building_lat,
@@ -36,12 +61,13 @@ class Model_Marker extends ORM {
        sites.long AS site_long, sites.active AS site_active'
                 )
                 ->from('spaces')
+                ->join('placements','space.id', 'placements.space_id')
                 ->join('buildings','spaces.building_id', 'buildings.id')
                 ->join('sites','buildings.site_id', 'sites.id')
-                ->where('spaces.id', $marker['space_id'])
-                ->get();
+                
+                ->where('spaces.id','=', $marker['space_id'])->execute()->as_array();
 
-        $location_info = $this->result_as_array($location_info);
+//        $location_info = $this->result_as_array($location_info);
         $location_info = $this->split_out_array_result(array('space','building','site'), $location_info);
         return array(
                 'markers'=>$markers,'space'=>$location_info['space'],

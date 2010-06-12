@@ -19,6 +19,10 @@ class Model_Site extends ORM {
         'long' => array('validate_latlong_required_as_pair'),
     );
 
+    public function sites_for_marker() {
+        $markers = $this->buildings->spaces->markers->find_all();
+    }
+
     public function validate_latlong_required_as_pair(Validate $validate, $field) {
         // if we are already invalid, just return
         if (array_key_exists($field, $validate->errors())) {
