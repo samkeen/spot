@@ -1,6 +1,6 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 
-class ORM extends Kohana_ORM {
+class Orm extends Kohana_ORM {
 
     /**
      * Add convienience call to $this->_validate->errors
@@ -31,6 +31,20 @@ class ORM extends Kohana_ORM {
                 ->where($this->_has_many[$alias]['foreign_key'], '=', $this->pk())
                 ->execute($this->_db);
         return $this;
+    }
+
+    protected function as_real_array($orm_results) {
+        $array_results = array();
+//        $orm_results = array();
+//        if($id===null) {
+//            $orm_results = ORM::factory($model_name)->find_all();
+            foreach ($orm_results as $site) {
+                $array_results[] = $site->as_array();
+            }
+//        } else {
+//            $array_results[] = ORM::factory($model_name,$id)->as_array();
+//        }
+        return $array_results;
     }
 
 }
