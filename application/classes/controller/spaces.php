@@ -12,7 +12,7 @@ class Controller_Spaces extends Controller_Template {
      */
     public function action_with($target_marker_id=null) {
 //        die('here');
-        $this->template = View::factory("space_for");
+        $this->template = View::factory("space_with");
         $this->template->target_marker_id = $target_marker_id;
         $this->template->title = 'Seating::Spaces';
 //        $this->template->content = View::factory('pages/spaces');

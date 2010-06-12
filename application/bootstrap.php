@@ -108,12 +108,13 @@ Route::set('api_index', 'api(/<controller>(/<id>))',array('id'=>'\d+'))
         'action'     => 'index',
     )
 );
-Route::set('api', 'api(/<controller>(/<action>(/<id>)))')
-    ->defaults(array(
-        'directory'  => 'api',
-        'controller' => 'home',
-        'action'     => 'index',
-    )
+Route::set('api', 'api(/<controller>(/<action>(/<id>)))',
+           array('id' => '[a-zA-Z0-9_\.@]++'))
+        ->defaults(array(
+            'directory'  => 'api',
+            'controller' => 'home',
+            'action'     => 'index',
+        )
 );
 Route::set('admin', 'admin(/<controller>(/<action>(/<id>)))')
     ->defaults(array(

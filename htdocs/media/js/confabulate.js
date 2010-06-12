@@ -2,9 +2,10 @@
 
 var confab = {
   // 
-  get_markers_url   : "http://seating.local/markers/space_for",
-  save_markers_url  : "http://seating.local/markers/save",
-  remove_marker_url : "http://seating.local/markers/remove",
+  get_markers_url   : "/api/spaces/with",
+  get_spaces_url    : "/api/spaces",
+  save_markers_url  : "/api/markers/save",
+  remove_marker_url : "/api/markers/remove",
 
   // the current makers indexed by id (primary key)
   current_markers : {},
