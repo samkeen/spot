@@ -27,9 +27,9 @@ client::validation('index');
 
 <p>
 <?php
-echo form::auto_label('img_uri');
-echo form::input('img_uri', $space->img_uri, array('size="20"'));
-client::validation('img_uri');
+echo form::auto_label('img_filename');
+echo form::input('img_filename', $space->img_filename, array('size="20"'));
+client::validation('img_filename');
 ?>
 </p>
 

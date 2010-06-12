@@ -29,7 +29,7 @@ class Model_Placement extends ORM {
                 'markers.id AS placement_id, markers.email AS placement_email,
            placements.x AS placement_x, placements.y AS placement_y,
            spaces.id AS space_id, spaces.name AS space_name,
-           spaces.img_uri AS space_img_uri, spaces.index AS space_index,
+           spaces.img_filename AS space_img_filename, spaces.index AS space_index,
            buildings.name AS building_name, buildings.lat AS building_lat,
            buildings.long AS building_long, buildings.active AS building_active,
            sites.name AS site_name, sites.lat AS site_lat,

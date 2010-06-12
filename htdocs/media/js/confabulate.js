@@ -11,8 +11,6 @@ var confab = {
   current_markers : {},
   // defined in this.click_draw
   click_coords:null,
-  // folder where interest images would be stoed locally [defualt to store on rsrd_server]
-  interest_folder : '/media/img/spaces',
 
   current_focus_id : null,
   
@@ -270,13 +268,19 @@ var confab = {
     if(this.current_focus_id!==null) {
       $.getJSON(that.get_markers_url+"/"+this.current_focus_id+"?callback=?",
         function(space_w_markers){
-          var markers = space_w_markers['placements'];
+
+
+          /**
+           * @todo just grab first and get single space working, then
+           *       refactor to get multi space working
+           */
+           space_w_markers = space_w_markers[0];
+
+          var markers = space_w_markers['markers'];
           that.present_location.site = space_w_markers['site'];
           that.present_location.building = space_w_markers['building'];
           that.present_location.space = space_w_markers['space'];
-          var image_path = that.present_location.space.img_uri.match(/^https?:\/\//)
-            ? that.present_location.space.img_uri
-            : that.interest_folder+'/'+that.present_location.space.img_uri;
+          var image_path = that.present_location.space.image_uri;
           var image_height = null;
           var image_width = null;
           // clear the list

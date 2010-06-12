@@ -11,7 +11,58 @@ class Model_Marker extends ORM {
     protected $_rules = array(
         'email' => array('not_empty' => array()),
     );
-
+    /**
+     * For a the given unique identifier for a marker (email),
+     * Find all the spaces where that marker has presence.
+     * For each of those spaces include all the other markers in that
+     * space.
+     * This is the core heavy lifter method that populates the floor plans.
+     * 
+     * @return array
+     * ex
+     * [0] => Array (
+        [site] => Array(
+                [id] => 1
+                [name] => Mountain View
+                [lat] => 37.389280000000
+                [long] => -122.083114000000
+                [active] => 1)
+        [building] => Array(
+                [id] => 1
+                [site_id] => 1
+                [name] => Main Office
+                [lat] => 37.3893
+                [long] => -122.083
+                [active] => 1)
+        [space] => Array(
+                [id] => 1
+                [image_uri] => mtview0_3.gif
+                [index] => 3
+                [name] => 3rd floor)
+        [markers] => Array(
+                [0] => Array(
+                        [id] => 1
+                        [email] => sam@somewhere.com
+                        [active] => 1
+                        [marker_id] => 1
+                        [space_id] => 1
+                        [x] => 581
+                        [y] => 112
+                        [focus] => true)
+                [1] => Array(
+                        [id] => 2
+                        [email] => joe@somewhere.com
+                        [active] => 1
+                        [marker_id] => 2
+                        [space_id] => 1
+                        [x] => 710
+                        [y] => 132
+                        [focus] => false)
+                ... more markers ...
+            )
+       )
+       [1] => Array  (... next space this marker resides in ....)
+     */
     public function get_space_by_email() {
         $out = array();
         if($this->email) {
@@ -21,59 +72,29 @@ class Model_Marker extends ORM {
                 foreach ($spaces as $space) {
                     // fully populate the object (lazy loading)
                     $space->building->site;
+                    $markers = array();
+                    foreach ($space->markers->find_all()->as_array() as $marker) {
+                        $marker = $marker->as_array();
+                        $marker['focus'] = $this->email == $marker['email'];
+                        $markers[]=$marker;
+                    }
                     $space = $space->as_array();
-//                    print_r($space);
                     $reorg['site'] = $space['building']['site'];
                     unset ($space['building']['site']);
                     $reorg['building'] = $space['building'];
                     $reorg['space'] = array(
                         'id' => $space['space_id'],
-                        'image_uri' => $space['img_uri'],
+                        'image_uri' => 
+                            Kohana::config('core.paths.space_images_folder')
+                            ."/{$space['img_filename']}",
                         'index' => $space['index'],
-                        'name' => $space['name']
+                        'name' => $space['name'],
                     );
-                    $reorg['marker'] = array(
-                        'id' => $space['id'],
-                        'email' => $this->email,
-                        'x' => $space['x'],
-                        'y' => $space['y'],
-                    );
+                    $reorg['markers'] = $markers;
                     $out[] = $reorg;
                 }
         }
         return $out;
-      
-        
-//        $markers = $this->result_as_array($markers);
-        foreach ($markers as $marker) {
-            if($marker['email']==$email) {
-                $focus_marker=$marker;
-                break;
-            }
-        }
-        $location_info =
-                DB::select(
-                'spaces.name AS space_name, spaces.index AS space_index,
-       spaces.img_uri AS space_img_uri, spaces.active AS space_active,
-       buildings.name AS building_name, buildings.lat AS building_lat,
-       buildings.long AS building_long, buildings.active AS building_active,
-       sites.name AS site_name, sites.lat AS site_lat,
-       sites.long AS site_long, sites.active AS site_active'
-                )
-                ->from('spaces')
-                ->join('placements','space.id', 'placements.space_id')
-                ->join('buildings','spaces.building_id', 'buildings.id')
-                ->join('sites','buildings.site_id', 'sites.id')
-                
-                ->where('spaces.id','=', $marker['space_id'])->execute()->as_array();
-
-//        $location_info = $this->result_as_array($location_info);
-        $location_info = $this->split_out_array_result(array('space','building','site'), $location_info);
-        return array(
-                'markers'=>$markers,'space'=>$location_info['space'],
-                'building'=>$location_info['building'], 'site'=>$location_info['site'],
-                'focus'=>$focus_marker
-        );
     }
 //
 //    public function save(array $marker=array(), $marker_id = null) {

@@ -33,7 +33,7 @@ class Controller_Spaces extends Controller_Template {
                 'building_id' => '',
                 'name' => '',
                 'index' => '',
-                'img_uri' => '',
+                'img_filename' => '',
                 'active' => ''
         );
         $errors = $form;
@@ -44,7 +44,7 @@ class Controller_Spaces extends Controller_Template {
             $post->add_rules('buildings_id', 'required', 'digit');
             $post->add_rules('name', 'required');
             $post->add_rules('index', 'required');
-            $post->add_rules('img_uri', 'required');
+            $post->add_rules('img_filename', 'required');
             $post->add_rules('active', 'required');
             
             if ($post->validate()) {
