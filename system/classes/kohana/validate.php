@@ -976,15 +976,29 @@ class Kohana_Validate extends ArrayObject {
 				// Translate the label
 				$label = __($label);
 			}
-            
 
 			// Start the translation values list
 			$values = array(':field' => $label);
+
+			// Value passed to the callback
+			$values[':value'] = array_shift($params);
+
+			if (is_array($values[':value']))
+			{
+				// All values must be strings
+				$values[':value'] = implode(', ', Arr::flatten($values[':values']));
+			}
 
 			if ($params)
 			{
 				foreach ($params as $key => $value)
 				{
+					if (is_array($value))
+					{
+						// All values must be strings
+						$value = implode(', ', Arr::flatten($value));
+					}
+
 					// Check if a label for this parameter exists
 					if (isset($this->_labels[$value]))
 					{
@@ -998,7 +1012,7 @@ class Kohana_Validate extends ArrayObject {
 					}
 
 					// Add each parameter as a numbered value, starting from 1
-					$values[':param'.($key + 1)] = is_array($value) ? implode(', ', $value) : $value;
+					$values[':param'.($key + 1)] = $value;
 				}
 			}
 

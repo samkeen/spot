@@ -4,7 +4,7 @@ var confab = {
   // 
   get_markers_url   : "/api/spaces/with",
   get_spaces_url    : "/api/spaces",
-  save_markers_url  : "/api/markers/save",
+  save_markers_url  : "/api/markers",
   remove_marker_url : "/api/markers/remove",
 
   // the current makers indexed by id (primary key)
@@ -85,10 +85,15 @@ var confab = {
      */
   save_marker : function(marker) {
     var that = this;
-    var marker_id = marker.id!==null ? "/"+marker.id : "/";
+    var request_method = 'post';
+    var marker_id_path_part = '/';
+    if(marker.id!==null) {
+        request_method = 'put';
+        marker_id_path_part = '/'+marker.id;
+    }
     $.getJSON(
-      that.save_markers_url+marker_id+"?callback=?",
-      that.square_brackify_keys('person', marker),
+      that.save_markers_url+marker_id_path_part+"?_method="+request_method+"&callback=?",
+      that.square_brackify_keys('payload', marker),
       function(result){
         if(result['success']) {
           $('#marker_feedback p')

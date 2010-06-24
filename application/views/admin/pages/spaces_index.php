@@ -8,8 +8,13 @@
         <?php echo HTML::anchor("admin/spaces/delete/{$space->id}","Delete"); ?>
         <ul>
             <?php foreach($space->markers->find_all() as $marker) { ?>
+            
             <li>
-                <span class="name"><?php echo HTML::chars($marker->email); ?></span>
+                <span class="name">
+                    <?php echo HTML::chars($marker->email); ?>
+                    (<?php echo "{$marker->placement->x}, {$marker->y}" ?>)
+                </span>
+                
                 <?php echo HTML::anchor("admin/markers/edit/{$marker->id}","Edit"); ?>
                 <?php echo HTML::anchor("admin/markers/delete/{$marker->id}","Delete"); ?>
             </li>

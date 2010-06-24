@@ -7,7 +7,7 @@ class Model_Site extends ORM {
     protected $_filters = array(
         true => array('trim' => array()),
     );
-
+    
     protected $_rules = array(
         'name' => array('not_empty' => array()),
         'lat' => array('numeric' => array()),

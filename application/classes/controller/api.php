@@ -17,6 +17,8 @@ class Controller_Api extends Controller {
     protected $request_method = null;
     protected $original_action = '';
 
+    protected $payload = array();
+
     protected $action_map = array (
 		'GET'    => 'index',
 		'PUT'    => 'update',
@@ -30,6 +32,9 @@ class Controller_Api extends Controller {
      */
     protected $additional_actions = array();
     protected $requesting_additional_action = false;
+
+    protected $error_status_code = 400;
+    protected $error_message = '';
     
     public function  __construct($request) {
         $this->json_callback = Arr::get($_GET, 'callback');
@@ -50,20 +55,40 @@ class Controller_Api extends Controller {
         // emulated REST, just looking for _meod= in GET
         $request_method = strtoupper(Arr::get($_GET, '_method','get'));
         // switch to this for a true REST
-        // $request_method = Request::$method;\
+        // $request_method = Request::$method;
 
-        $this->requesting_additional_action = key_exists($this->original_action, $this->additional_actions);
-        if($this->requesting_additional_action
-           && in_array($request_method, $this->additional_actions[$this->original_action])) {
-            return parent::before();
+        // little upfront sanity check
+        if( in_array($request_method, array('PUT','DELETE'))
+            && ! $this->request->param('id')) {
+            $this->build_error_response(400,'Missing required parameter: [id]');
         } else {
-           $this->request->action = 'invalid';
+            $this->requesting_additional_action = key_exists($this->original_action, $this->additional_actions);
+            if($this->requesting_additional_action) {
+                if(in_array($request_method, $this->additional_actions[$this->original_action])) {
+                   return parent::before();
+                } else {
+                   $this->build_error_response(405);
+                }
+            }
+            if(! isset($this->action_map[$request_method])) {
+                $this->build_error_response(405);
+            } else {
+                $this->action_map[$request_method];
+            }
+            
+            $this->set_payload($request_method);
         }
-        $this->request->action = ! isset($this->action_map[$request_method])
-            ? 'invalid'
-            : $this->action_map[$request_method];
         return parent::before();
 	}
+    /**
+     * abstract how we get data for PUT and POST and DELETE since it is all
+     * currently comming through GET
+     */
+    protected function set_payload($request_method) {
+        if(in_array($request_method, array('POST','PUT'))) {
+            $this->payload = Arr::get($_GET, 'payload');
+        }
+    }
     /**
      *
      * @param array $allowed_action An allowed action exception that will not
@@ -81,20 +106,38 @@ class Controller_Api extends Controller {
         $request_methods = array_map('strtoupper', $request_methods);
         $this->additional_actions[$action] = $request_methods;
     }
+    /**
+     * Sets action to $this->action_invalid and defines the response
+     *   code (default 400), and an optional error message.  If
+     *   error_message not given, we use stock Request::$messages[]
+     *
+     * @param int $respose_code
+     * @param string $error_message
+     */
+    protected function build_error_response($respose_code=400,$error_message=null) {
+        $this->request->action = 'invalid';
+        $this->error_status_code = $respose_code;
+        $this->error_message = $error_message
+            ? $error_message
+            : Arr::get(Request::$messages, $respose_code);
+    }
 
     /**
-	 * Sends a 405 "Method Not Allowed" response and a list of allowed actions.
+	 * Sends a error response.
 	 */
 	public function action_invalid() {
 		// Send the "Method Not Allowed" response
-		$this->request->status = 405;
-        if($this->requesting_additional_action) {
-            $allowed_headers = implode(', ', $this->additional_actions[$this->original_action]);
-        } else {
-            $allowed_headers = implode(', ', array_keys($this->action_map));
+		$this->request->status = $this->error_status_code;
+        
+        if($this->request->status == 405) { // "Method Not Allowed"
+            if($this->requesting_additional_action) {
+                $allowed_headers = implode(', ', $this->additional_actions[$this->original_action]);
+            } else {
+                $allowed_headers = implode(', ', array_keys($this->action_map));
+            }
+            $this->request->headers['Allow'] = $allowed_headers;
         }
-		$this->request->headers['Allow'] = $allowed_headers;
-
+        $this->request->response = json_encode(array('error'=>$this->error_message));
 	}
     /**
      * json encoe the $data array applying jsonp callback if requested
