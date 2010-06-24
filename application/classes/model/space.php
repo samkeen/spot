@@ -3,7 +3,12 @@
 class Model_Space extends ORM {
 
     protected $_belongs_to = array('building' => array());
-    protected $_has_many = array('markers' => array('through' => 'placements'));
+    protected $_has_many = array(
+        'markers' => array(
+            'model' => 'marker'
+        )
+    );
+    
 
     protected $_filters = array(
         true => array('trim' => array()),

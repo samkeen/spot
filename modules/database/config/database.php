@@ -20,12 +20,34 @@ return array
 			'hostname'   => 'localhost',
 			'username'   => 'root',
 			'password'   => '',
-			'persistent' => false,
+			'persistent' => FALSE,
 			'database'   => 'seating',
 		),
 		'table_prefix' => '',
 		'charset'      => 'utf8',
-		'caching'      => false,
-		'profiling'    => true,
-	)
+		'caching'      => FALSE,
+		'profiling'    => TRUE,
+	),
+	'alternate' => array(
+		'type'       => 'pdo',
+		'connection' => array(
+			/**
+			 * The following options are available for PDO:
+			 *
+			 * string   dsn
+			 * string   username
+			 * string   password
+			 * boolean  persistent
+			 * string   identifier
+			 */
+			'dsn'        => 'mysql:host=localhost;dbname=kohana',
+			'username'   => 'root',
+			'password'   => 'r00tdb',
+			'persistent' => FALSE,
+		),
+		'table_prefix' => '',
+		'charset'      => 'utf8',
+		'caching'      => FALSE,
+		'profiling'    => TRUE,
+	),
 );

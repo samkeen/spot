@@ -2,10 +2,15 @@
 
 class Model_Marker extends ORM {
 
-    protected $_has_many = array('spaces' => array('through' => 'placements'));
-
+    protected $_belongs_to = array(
+        'space' => array(
+            'model'=>'space'
+        )
+    );
     protected $_filters = array(
         TRUE => array('trim' => array()),
+        'x' => array('numeric' => array()),
+        'y'    => array('numeric' => array()),
     );
 
     protected $_rules = array(
@@ -39,6 +44,28 @@ class Model_Marker extends ORM {
                 [image_uri] => mtview0_3.gif
                 [index] => 3
                 [name] => 3rd floor)
+     *  [placements] => array(
+     *      [0] => array (
+     *          id      => 1,
+     *          x       => 581,
+     *          y       => 112,
+     *          focus   => true,
+     *          marker  => array(
+     *              id => 1,
+     *              email => joe@somewhere.com
+     *          )
+     *      ),
+     *      [1] => array (
+     *          id      => 2,
+     *          x       => 555,
+     *          y       => 152,
+     *          focus   => false,
+     *          marker  => array(
+     *              id => 1,
+     *              email => joe@somewhere.com
+     *          )
+     *      )     *
+     *  )
         [markers] => Array(
                 [0] => Array(
                         [id] => 1
@@ -78,13 +105,16 @@ class Model_Marker extends ORM {
                         $marker['focus'] = $this->email == $marker['email'];
                         $markers[]=$marker;
                     }
+//                    die;
+                    
                     $space = $space->as_array();
+                    var_dump($space);
                     $reorg['site'] = $space['building']['site'];
                     unset ($space['building']['site']);
                     $reorg['building'] = $space['building'];
                     $reorg['space'] = array(
                         'id' => $space['space_id'],
-                        'image_uri' => 
+                        'image_uri' =>
                             Kohana::config('core.paths.space_images_folder')
                             ."/{$space['img_filename']}",
                         'index' => $space['index'],
