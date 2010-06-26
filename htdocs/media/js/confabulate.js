@@ -279,7 +279,7 @@ var confab = {
            * @todo just grab first and get single space working, then
            *       refactor to get multi space working
            */
-           space_w_markers = space_w_markers[0];
+//           space_w_markers = space_w_markers[0];
 
           var markers = space_w_markers['markers'];
           that.present_location.site = space_w_markers['site'];

@@ -25,10 +25,8 @@ class Controller_Api_Spaces extends Controller_Api {
         var_dump($data);
     }
     public function action_with($marker_identifier=null) {
-        
         return $this->json_response(
-             ORM::factory('marker', array('email' => $marker_identifier))
-                ->get_space_by_email()
+             Model_Space::with_marker($marker_identifier)
         );
 
     }
